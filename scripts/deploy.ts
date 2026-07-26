@@ -10,7 +10,8 @@ import hre from "hardhat";
  *     the Safe itself, once deployed — see readme.md).
  */
 async function main() {
-  const [deployer] = await hre.viem.getWalletClients();
+  const { viem } = await hre.network.connect();
+  const [deployer] = await viem.getWalletClients();
   const safeAddress = process.env.SAFE_ADDRESS;
   if (!safeAddress) {
     throw new Error("Set SAFE_ADDRESS in .env before deploying (the company treasury Safe).");
@@ -19,15 +20,15 @@ async function main() {
   let usdcAddress = process.env.USDC_ADDRESS;
   if (!usdcAddress) {
     console.log("USDC_ADDRESS not set — deploying MockUSDC for testing...");
-    const mockUsdc = await hre.viem.deployContract("MockUSDC");
+    const mockUsdc = await viem.deployContract("MockUSDC");
     usdcAddress = mockUsdc.address;
     console.log("MockUSDC deployed at:", usdcAddress);
   }
 
-  const confidentialUsdc = await hre.viem.deployContract("ConfidentialUSDC", [usdcAddress]);
+  const confidentialUsdc = await viem.deployContract("ConfidentialUSDC", [usdcAddress]);
   console.log("ConfidentialUSDC (cUSDC) deployed at:", confidentialUsdc.address);
 
-  const payrollVault = await hre.viem.deployContract("PayrollVault", [
+  const payrollVault = await viem.deployContract("PayrollVault", [
     confidentialUsdc.address,
     safeAddress,
     deployer.account.address, // payroll admin — change with setAdmin() if needed

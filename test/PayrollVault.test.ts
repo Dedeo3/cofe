@@ -8,11 +8,12 @@ import hre from "hardhat";
  */
 describe("PayrollVault", () => {
   it("deploys and wires up the confidential token + vault", async () => {
-    const mockUsdc = await hre.viem.deployContract("MockUSDC");
-    const confidentialUsdc = await hre.viem.deployContract("ConfidentialUSDC", [mockUsdc.address]);
-    const [admin, treasury] = await hre.viem.getWalletClients();
+    const { viem } = await hre.network.connect();
+    const mockUsdc = await viem.deployContract("MockUSDC");
+    const confidentialUsdc = await viem.deployContract("ConfidentialUSDC", [mockUsdc.address]);
+    const [admin, treasury] = await viem.getWalletClients();
 
-    const vault = await hre.viem.deployContract("PayrollVault", [
+    const vault = await viem.deployContract("PayrollVault", [
       confidentialUsdc.address,
       treasury.account.address,
       admin.account.address,

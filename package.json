@@ -12,6 +12,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "mint:testusdc": "hardhat run scripts/mint-test-usdc.ts --network sepolia",
     "payroll:run": "hardhat run scripts/run-payroll.ts --network sepolia"
   },
   "dependencies": {
