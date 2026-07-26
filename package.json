@@ -1,0 +1,34 @@
+{
+  "name": "confidential-safe-payroll",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Confidential Safe Payroll Module — privacy layer on top of Gnosis Safe using iExec Nox",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "payroll:run": "hardhat run scripts/run-payroll.ts --network sepolia"
+  },
+  "dependencies": {
+    "@iexec-nox/handle": "^0.1.0-beta.13",
+    "@iexec-nox/nox-confidential-contracts": "^0.2.2",
+    "@iexec-nox/nox-protocol-contracts": "^0.2.4",
+    "@openzeppelin/contracts": "^5.6.1",
+    "@safe-global/api-kit": "^2",
+    "@safe-global/protocol-kit": "^4",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@iexec-nox/nox-hardhat-plugin": "^0.1.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
+    "hardhat": "^3.9.0",
+    "typescript": "^5.5.0",
+    "viem": "^2.46.3"
+  }
+}
