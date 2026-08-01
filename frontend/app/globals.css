@@ -79,6 +79,17 @@ a {
   border-bottom: 1px solid rgba(253, 241, 225, 0.1);
 }
 
+/* .btn defaults to dark ink text for use on the cream cards — invisible
+   against the header's dark background, so flip it here. */
+.site-header .btn {
+  color: var(--paper);
+  border-color: rgba(253, 241, 225, 0.32);
+}
+.site-header .btn:hover:not(:disabled) {
+  border-color: var(--paper);
+  background: rgba(253, 241, 225, 0.08);
+}
+
 .shell {
   max-width: 760px;
   margin-inline: auto;
