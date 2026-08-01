@@ -71,7 +71,7 @@ function BrowserFrame({
 }) {
   return (
     <div className="browser-frame">
-      <div className="browser-chrome">
+      <div className="browser-chrome" aria-hidden="true">
         <span className="browser-dot" />
         <span className="browser-dot" />
         <span className="browser-dot" />

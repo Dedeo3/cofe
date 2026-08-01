@@ -2,17 +2,23 @@
 
 import { useState } from "react";
 import { Interface } from "ethers";
-import { createEthersHandleClient } from "@iexec-nox/handle";
-import SafeSdkPkg from "@safe-global/protocol-kit";
-import SafeApiKitPkg from "@safe-global/api-kit";
 import { connectWallet } from "../../lib/wallet";
 import { PAYROLL_VAULT_ABI, PAYROLL_VAULT_ADDRESS, CONFIDENTIAL_USDC_ADDRESS, SAFE_ADDRESS, CHAIN_ID } from "../../lib/contracts";
 
-// Both packages are CJS-only; depending on the bundler's interop the default
-// import may already be the class, or the whole module.exports. Unwrap
-// defensively so this works either way.
-const Safe: typeof SafeSdkPkg = (SafeSdkPkg as any).default ?? SafeSdkPkg;
-const SafeApiKit: typeof SafeApiKitPkg = (SafeApiKitPkg as any).default ?? SafeApiKitPkg;
+// @safe-global/protocol-kit + api-kit alone push this route's first-load JS
+// from ~100KB to 1.2MB. Both are CJS-only (needing a defensive .default
+// unwrap under this project's ESM setup regardless of import style), so
+// loading them dynamically inside runPayroll() — only once the button is
+// actually clicked — keeps the initial page load light.
+async function loadSafeSdk() {
+  const [{ default: SafeSdkPkg }, { default: SafeApiKitPkg }] = await Promise.all([
+    import("@safe-global/protocol-kit"),
+    import("@safe-global/api-kit"),
+  ]);
+  const Safe: typeof SafeSdkPkg = (SafeSdkPkg as any).default ?? SafeSdkPkg;
+  const SafeApiKit: typeof SafeApiKitPkg = (SafeApiKitPkg as any).default ?? SafeApiKitPkg;
+  return { Safe, SafeApiKit };
+}
 
 type Row = { employee: string; amount: string };
 
@@ -49,6 +55,7 @@ export default function AdminPage() {
     setBusy(true);
     try {
       const { address: ownerAddress } = await connectWallet();
+      const { createEthersHandleClient } = await import("@iexec-nox/handle");
 
       // Proofs are bound to (app, owner) = the contract and msg.sender active
       // when the proof is consumed. runPayroll() forwards the proof into
@@ -93,6 +100,7 @@ export default function AdminPage() {
       const data = vaultInterface.encodeFunctionData("runPayroll", [employees, encryptedAmounts, inputProofs]);
 
       setStatus("Connecting to Safe...");
+      const { Safe, SafeApiKit } = await loadSafeSdk();
       const protocolKit = await Safe.init({ provider: window.ethereum, signer: ownerAddress, safeAddress: SAFE_ADDRESS });
       const threshold = await protocolKit.getThreshold();
 
@@ -137,7 +145,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main>
+    <main id="main-content">
       <div className="tag">Admin console</div>
       <h1 style={{ fontSize: "1.9rem" }}>Run payroll</h1>
 
@@ -153,9 +161,11 @@ export default function AdminPage() {
         <table style={{ marginTop: "1.25rem" }}>
           <thead>
             <tr>
-              <th>Employee address</th>
-              <th>Amount (USDC)</th>
-              <th />
+              <th scope="col">Employee address</th>
+              <th scope="col">Amount (USDC)</th>
+              <th scope="col">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -165,7 +175,10 @@ export default function AdminPage() {
                   <input
                     className="field"
                     style={{ width: "100%" }}
-                    placeholder="0x..."
+                    placeholder="0x…"
+                    aria-label={`Employee ${i + 1} address`}
+                    autoComplete="off"
+                    spellCheck={false}
                     value={row.employee}
                     onChange={(e) => updateRow(i, "employee", e.target.value)}
                   />
@@ -174,13 +187,17 @@ export default function AdminPage() {
                   <input
                     className="field"
                     style={{ width: "100%" }}
+                    type="text"
+                    inputMode="decimal"
                     placeholder="2500.00"
+                    aria-label={`Employee ${i + 1} amount in USDC`}
+                    autoComplete="off"
                     value={row.amount}
                     onChange={(e) => updateRow(i, "amount", e.target.value)}
                   />
                 </td>
                 <td>
-                  <button className="icon-btn" onClick={() => removeRow(i)} aria-label="Remove row">
+                  <button className="icon-btn" onClick={() => removeRow(i)} aria-label={`Remove employee ${i + 1}`}>
                     ✕
                   </button>
                 </td>
@@ -195,7 +212,7 @@ export default function AdminPage() {
 
         <div style={{ marginTop: "1.5rem" }}>
           <button className="btn btn-primary" onClick={runPayroll} disabled={busy || !PAYROLL_VAULT_ADDRESS}>
-            {busy ? "Running..." : "Encrypt & run payroll"}
+            {busy ? "Running…" : "Encrypt & run payroll"}
           </button>
         </div>
 
@@ -203,7 +220,7 @@ export default function AdminPage() {
           <p className="status status-error">NEXT_PUBLIC_PAYROLL_VAULT_ADDRESS is not set — check .env.local.</p>
         )}
 
-        {status && <p className="status">{status}</p>}
+        <div aria-live="polite">{status && <p className="status">{status}</p>}</div>
       </div>
     </main>
   );

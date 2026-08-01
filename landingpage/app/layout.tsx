@@ -29,6 +29,10 @@ export const metadata: Metadata = {
     "A privacy layer on top of Gnosis Safe. Team salaries encrypted end-to-end via iExec Nox, settled on Sepolia.",
 };
 
+export const viewport = {
+  themeColor: "#0b1110",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,7 +43,12 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${geist.variable} ${specialElite.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#hero">
+          Skip to content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

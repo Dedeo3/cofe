@@ -1,6 +1,6 @@
 export default function HomePage() {
   return (
-    <main>
+    <main id="main-content">
       <div className="tag">A privacy layer for onchain payroll</div>
       <h1>
         Pay your team.
@@ -24,7 +24,7 @@ export default function HomePage() {
       <div className="card">
         <h2 style={{ marginTop: 0 }}>Employee</h2>
         <p>Connect your wallet and decrypt your own confidential balance.</p>
-        <a href="/employee" className="btn" style={{ display: "inline-block", textDecoration: "none" }}>
+        <a href="/employee" className="btn btn-primary" style={{ display: "inline-block", textDecoration: "none" }}>
           Check balance →
         </a>
       </div>

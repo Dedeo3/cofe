@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Contract, formatUnits } from "ethers";
-import { createEthersHandleClient } from "@iexec-nox/handle";
 import { connectWallet } from "../../lib/wallet";
 import { CONFIDENTIAL_USDC_ABI, CONFIDENTIAL_USDC_ADDRESS } from "../../lib/contracts";
 
@@ -28,6 +27,7 @@ export default function EmployeePage() {
       ]);
 
       setStatus("Decrypting your balance (only you can see this)...");
+      const { createEthersHandleClient } = await import("@iexec-nox/handle");
       const handleClient = await createEthersHandleClient(signer);
       const { value } = await handleClient.decrypt(balanceHandle);
 
@@ -41,7 +41,7 @@ export default function EmployeePage() {
   }
 
   return (
-    <main>
+    <main id="main-content">
       <div className="tag">Employee portal</div>
       <h1 style={{ fontSize: "1.9rem" }}>Check your balance</h1>
       <p>
@@ -52,7 +52,7 @@ export default function EmployeePage() {
 
       <div className="card">
         <button className="btn btn-primary" onClick={checkBalance} disabled={busy || !CONFIDENTIAL_USDC_ADDRESS}>
-          {busy ? "Checking..." : "Connect & check my balance"}
+          {busy ? "Checking…" : "Connect & check my balance"}
         </button>
 
         {!CONFIDENTIAL_USDC_ADDRESS && (
@@ -61,7 +61,7 @@ export default function EmployeePage() {
 
         {address && <p style={{ fontFamily: "var(--mono)", fontSize: "0.85rem", marginTop: "1rem" }}>Connected: {address}</p>}
         {balance && <p className="balance">{balance}</p>}
-        {status && <p className="status">{status}</p>}
+        <div aria-live="polite">{status && <p className="status">{status}</p>}</div>
       </div>
     </main>
   );
