@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Interface } from "ethers";
-import { connectWallet } from "../../lib/wallet";
+import { useWallet } from "../../lib/WalletContext";
 import { PAYROLL_VAULT_ABI, PAYROLL_VAULT_ADDRESS, CONFIDENTIAL_USDC_ADDRESS, SAFE_ADDRESS, CHAIN_ID } from "../../lib/contracts";
 
 // @safe-global/protocol-kit + api-kit alone push this route's first-load JS
@@ -23,7 +23,7 @@ async function loadSafeSdk() {
 type Row = { employee: string; amount: string };
 
 export default function AdminPage() {
-  const [address, setAddress] = useState<string | null>(null);
+  const { address, connect } = useWallet();
   const [rows, setRows] = useState<Row[]>([{ employee: "", amount: "" }]);
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -31,8 +31,7 @@ export default function AdminPage() {
   async function handleConnect() {
     setStatus("");
     try {
-      const { address } = await connectWallet();
-      setAddress(address);
+      await connect();
     } catch (err: any) {
       setStatus(err.message ?? String(err));
     }
@@ -54,7 +53,7 @@ export default function AdminPage() {
     setStatus("");
     setBusy(true);
     try {
-      const { address: ownerAddress, provider } = await connectWallet();
+      const { address: ownerAddress, provider } = await connect();
       const { createEthersHandleClient } = await import("@iexec-nox/handle");
 
       // Proofs are bound to (app, owner) = the contract and msg.sender active
@@ -118,7 +117,7 @@ export default function AdminPage() {
         setStatus(`Submitting payroll for ${employees.length} employee(s)...`);
         const execResult = await protocolKit.executeTransaction(signedSafeTransaction);
         setStatus(`Tx submitted: ${execResult.hash} — waiting for confirmation...`);
-        await connectWallet().then(({ provider }) => provider.waitForTransaction(execResult.hash));
+        await provider.waitForTransaction(execResult.hash);
         setStatus(`Payroll run complete for ${employees.length} employee(s). Amounts stayed confidential end-to-end.`);
         return;
       }

@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { Contract, formatUnits } from "ethers";
-import { connectWallet } from "../../lib/wallet";
+import { useWallet } from "../../lib/WalletContext";
 import { CONFIDENTIAL_USDC_ABI, CONFIDENTIAL_USDC_ADDRESS } from "../../lib/contracts";
 
 export default function EmployeePage() {
-  const [address, setAddress] = useState<string | null>(null);
+  const { address, connect } = useWallet();
   const [balance, setBalance] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
@@ -16,8 +16,7 @@ export default function EmployeePage() {
     setBalance(null);
     setBusy(true);
     try {
-      const { signer, address } = await connectWallet();
-      setAddress(address);
+      const { signer, address } = await connect();
 
       const cUsdc = new Contract(CONFIDENTIAL_USDC_ADDRESS, CONFIDENTIAL_USDC_ABI, signer);
       const [balanceHandle, decimals, symbol] = await Promise.all([
@@ -52,7 +51,7 @@ export default function EmployeePage() {
 
       <div className="card">
         <button className="btn btn-primary" onClick={checkBalance} disabled={busy || !CONFIDENTIAL_USDC_ADDRESS}>
-          {busy ? "Checking…" : "Connect & check my balance"}
+          {busy ? "Checking…" : address ? "Refresh balance" : "Connect & check my balance"}
         </button>
 
         {!CONFIDENTIAL_USDC_ADDRESS && (
