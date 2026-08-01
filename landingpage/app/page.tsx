@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import HeroReveal from "@/components/HeroReveal";
 import Footer from "@/components/Footer";
 
@@ -57,7 +58,6 @@ const LAUNCH_APP_URL = "http://localhost:3001";
 export default function Home() {
   useEffect(() => {
     const section = document.querySelector<HTMLElement>(".cinema-scroll");
-    const root = document.documentElement;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sightsTrack = document.querySelector<HTMLElement>(".sights-track");
     const sightsControls = document.querySelector<HTMLElement>(".sights-controls");
@@ -106,8 +106,11 @@ export default function Home() {
         section.offsetHeight - window.innerHeight
       );
 
+    // Scoped to `section` rather than document.documentElement — every var
+    // consumer lives inside .cinema-scroll, and writing to :root forces a
+    // style recalc across the whole document on every animation frame.
     const setVar = (name: string, value: string | number) => {
-      root.style.setProperty(name, String(value));
+      section.style.setProperty(name, String(value));
     };
 
     function update() {
@@ -372,11 +375,13 @@ export default function Home() {
       >
         <div className="stage">
           <div className="world">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="scene-img sky-img"
               alt=""
               src="https://raft-blast-61784561.figma.site/_assets/v11/16b5007d9c93971e26ffe4e0e3e37946f6bd538c.png"
+              fill
+              sizes="100vw"
+              priority
             />
 
             <header className="site-header" aria-label="Primary navigation">
@@ -402,11 +407,13 @@ export default function Home() {
             </header>
 
             <div className="back-stack">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 className="scene-img back-img back-four"
                 alt=""
                 src="https://raft-blast-61784561.figma.site/_assets/v11/8a7f8af50e0ce92ec2e228e7b0b4112178c51cf1.png"
+                width={3840}
+                height={2160}
+                sizes="112vw"
               />
 
               <section
@@ -423,8 +430,7 @@ export default function Home() {
                       aria-label={card.aria}
                     >
                       <span className="sight-kicker">{card.kicker}</span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="sight-pin" alt="" src={card.pin} />
+                      <Image className="sight-pin" alt="" src={card.pin} width={44} height={44} />
                       <h3>{card.title}</h3>
                       <p>{card.copy}</p>
                     </article>
@@ -432,11 +438,14 @@ export default function Home() {
                 </div>
               </section>
 
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 className="scene-img back-img back-bazaar"
                 alt=""
                 src="https://raft-blast-61784561.figma.site/_assets/v11/864afe00e41e2fa20a5aa546e15cb807e0f81384.png"
+                width={3840}
+                height={2160}
+                sizes="112vw"
+                priority
               />
             </div>
 
@@ -459,29 +468,37 @@ export default function Home() {
 
             <h1 className="hero-title">PAYROLL</h1>
 
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="scene-img splitframe-img splitframe-left"
               alt=""
               src="https://raft-blast-61784561.figma.site/_assets/v11/7536d7b60a1fce482cf6edf3f0bffd3bad5d0f8a.png"
+              width={2880}
+              height={1620}
+              sizes="118vw"
             />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="scene-img splitframe-img splitframe-right"
               alt=""
               src="https://raft-blast-61784561.figma.site/_assets/v11/392db6a6a6b98e868bd7f8d3f55bb719d51e5028.png"
+              width={2880}
+              height={1620}
+              sizes="118vw"
             />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="scene-img bridge-img"
               alt=""
               src="https://raft-blast-61784561.figma.site/_assets/v11/c6a6d8ef49bca43f708aa852692942c45ec950d4.png"
+              width={2880}
+              height={1620}
+              sizes="(max-width: 900px) 190vw, 138vw"
             />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="scene-img frame-two-img"
               alt=""
               src="https://raft-blast-61784561.figma.site/_assets/v11/ba75252bab2b1c510987b74837770f7bc8a6b2d4.png"
+              width={3854}
+              height={2160}
+              sizes="(max-width: 900px) 176vw, 132vw"
             />
 
             <div className="shade" />
