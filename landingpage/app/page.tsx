@@ -55,8 +55,7 @@ const CONFIDENTIAL_USDC_SEPOLIA =
   "https://sepolia.etherscan.io/address/0x007512c93641cd1fad1477609fe1402e359fe867";
 const REPO_URL = "https://github.com/Dedeo3/cofe";
 
-// TODO: swap for the deployed frontend URL once it's live (currently local-only).
-const LAUNCH_APP_URL = "http://localhost:3001";
+const LAUNCH_APP_URL = "https://cofe-payroll-app.vercel.app";
 const ADMIN_URL = `${LAUNCH_APP_URL}/admin`;
 const EMPLOYEE_URL = `${LAUNCH_APP_URL}/employee`;
 
@@ -175,7 +174,7 @@ export default function Home() {
           </Reveal>
           <Reveal className="feature-visual" delay={140}>
             <BrowserFrame
-              url="localhost:3001/admin"
+              url="cofe-payroll-app.vercel.app/admin"
               screenshot="/screens/admin-preview.png"
               alt="Confidential Safe Payroll admin console"
             />
@@ -185,7 +184,7 @@ export default function Home() {
         <div className="feature-row feature-row-reverse">
           <Reveal className="feature-visual">
             <BrowserFrame
-              url="localhost:3001/employee"
+              url="cofe-payroll-app.vercel.app/employee"
               screenshot="/screens/employee-preview.png"
               alt="Confidential Safe Payroll employee balance portal"
             />
