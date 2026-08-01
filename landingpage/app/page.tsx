@@ -52,7 +52,7 @@ const PAYROLL_VAULT_SEPOLIA =
   "https://sepolia.etherscan.io/address/0xe7b082bc8f9022f66b0cadf6d2548ffaeb441489";
 
 // TODO: swap for the deployed frontend URL once it's live (currently local-only).
-const LAUNCH_APP_URL = "http://localhost:3000";
+const LAUNCH_APP_URL = "http://localhost:3001";
 
 export default function Home() {
   useEffect(() => {
