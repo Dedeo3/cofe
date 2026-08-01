@@ -11,7 +11,6 @@ import hre from "hardhat";
  */
 async function main() {
   const { viem } = await hre.network.connect();
-  const [deployer] = await viem.getWalletClients();
   const safeAddress = process.env.SAFE_ADDRESS;
   if (!safeAddress) {
     throw new Error("Set SAFE_ADDRESS in .env before deploying (the company treasury Safe).");
@@ -31,7 +30,7 @@ async function main() {
   const payrollVault = await viem.deployContract("PayrollVault", [
     confidentialUsdc.address,
     safeAddress,
-    deployer.account.address, // payroll admin — change with setAdmin() if needed
+    safeAddress, // payroll admin = the Safe itself — runPayroll() requires a Safe multisig exec, not a lone EOA
   ]);
   console.log("PayrollVault deployed at:", payrollVault.address);
 
@@ -40,6 +39,7 @@ async function main() {
   console.log(`  2. ConfidentialUSDC.wrap(${safeAddress}, <total payroll amount>)`);
   console.log(`  3. ConfidentialUSDC.setOperator(${payrollVault.address}, <expiry timestamp>)`);
   console.log("\nThen fill CONFIDENTIAL_USDC_ADDRESS and PAYROLL_VAULT_ADDRESS in .env.");
+  console.log("\nrunPayroll() now requires admin == Safe, so run it via `pnpm payroll:run` (uses the Safe SDK, not a raw EOA call).");
 }
 
 main().catch((error) => {

@@ -40,7 +40,10 @@ contract PayrollVault {
     /// employee are visible.
     /// @param employees Recipient addresses.
     /// @param encryptedAmounts Per-employee encrypted salary handle, produced
-    /// off-chain via the Nox handle SDK encryptInput(amount, "uint256", vaultAddress).
+    /// off-chain via the Nox handle SDK. Each proof must be bound to
+    /// (app = confidentialToken address, owner = this vault's address), since
+    /// that's the (msg.sender, contract) pair active when confidentialToken
+    /// consumes the proof inside confidentialTransferFrom().
     /// @param inputProofs Matching proof for each encrypted amount.
     function runPayroll(
         address[] calldata employees,
