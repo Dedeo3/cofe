@@ -145,7 +145,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main id="main-content">
+    <main>
       <div className="tag">Admin console</div>
       <h1 style={{ fontSize: "1.9rem" }}>Run payroll</h1>
 

@@ -1,6 +1,6 @@
 export default function HomePage() {
   return (
-    <main id="main-content">
+    <main>
       <div className="tag">A privacy layer for onchain payroll</div>
       <h1>
         Pay your team.

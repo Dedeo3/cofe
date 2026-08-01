@@ -41,7 +41,7 @@ export default function EmployeePage() {
   }
 
   return (
-    <main id="main-content">
+    <main>
       <div className="tag">Employee portal</div>
       <h1 style={{ fontSize: "1.9rem" }}>Check your balance</h1>
       <p>

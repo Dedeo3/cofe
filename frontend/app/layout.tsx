@@ -13,9 +13,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <a className="skip-link" href="#main-content">
-          Skip to content
-        </a>
         <header className="site-header">
           <a className="brand" href="/">
             Confidential Safe Payroll

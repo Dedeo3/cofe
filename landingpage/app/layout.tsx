@@ -43,12 +43,7 @@ export default function RootLayout({
       lang="en"
       className={`${spaceGrotesk.variable} ${geist.variable} ${specialElite.variable}`}
     >
-      <body>
-        <a className="skip-link" href="#hero">
-          Skip to content
-        </a>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
