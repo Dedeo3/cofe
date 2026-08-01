@@ -67,7 +67,10 @@ export default function Footer({
 
       <div className="closing-meta">
         <LogoDots />
-        <span>cofe &middot; Sepolia &middot; iExec WTF Hackathon 2026</span>
+        <span>
+          <span className="live-dot" aria-hidden="true" />
+          cofe &middot; Sepolia &middot; iExec WTF Hackathon 2026
+        </span>
       </div>
     </footer>
   );

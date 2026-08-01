@@ -2,6 +2,8 @@ import Image from "next/image";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import HeroIntro from "@/components/HeroIntro";
+import SiteHeader from "@/components/SiteHeader";
+import CountUp from "@/components/CountUp";
 
 const SIGHT_CARDS: {
   aria: string;
@@ -90,29 +92,10 @@ function BrowserFrame({
 export default function Home() {
   return (
     <main className="site-shell">
-      <header className="site-header" aria-label="Primary navigation">
-        <a className="site-logo" href="#hero">
-          Confidential Safe Payroll
-        </a>
-        <nav className="site-nav" aria-label="Main menu">
-          <a href="#hero">Overview</a>
-          <a href="#steps">Flow</a>
-          <a href="#preview">Product</a>
-          <a href={PAYROLL_VAULT_SEPOLIA} target="_blank" rel="noopener noreferrer">
-            Contract
-          </a>
-        </nav>
-        <a
-          className="language-switcher"
-          href={LAUNCH_APP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Launch app"
-        >
-          <span>Launch app</span>
-          <span aria-hidden="true">↗</span>
-        </a>
-      </header>
+      <SiteHeader
+        launchAppUrl={LAUNCH_APP_URL}
+        contractHref={PAYROLL_VAULT_SEPOLIA}
+      />
 
       <section className="hero" id="hero" aria-label="Confidential payroll overview">
         <div className="hero-grid" aria-hidden="true" />
@@ -142,7 +125,10 @@ export default function Home() {
       </section>
 
       <div className="trust-bar" aria-label="Live deployment details">
-        <span>Live on Sepolia</span>
+        <span>
+          <span className="live-dot" aria-hidden="true" />
+          Live on Sepolia
+        </span>
         <span aria-hidden="true">&middot;</span>
         <span>iExec WTF Hackathon 2026</span>
         <span aria-hidden="true">&middot;</span>
@@ -234,11 +220,15 @@ export default function Home() {
           </p>
           <dl className="facts">
             <div>
-              <dt>0</dt>
+              <dt>
+                <CountUp value={0} />
+              </dt>
               <dd>Changes required to Gnosis Safe</dd>
             </div>
             <div>
-              <dt>5</dt>
+              <dt>
+                <CountUp value={5} />
+              </dt>
               <dd>Steps from wrap to private redeem</dd>
             </div>
           </dl>
