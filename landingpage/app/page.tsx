@@ -49,10 +49,10 @@ const SIGHT_CARDS: {
 ];
 
 const PAYROLL_VAULT_SEPOLIA =
-  "https://sepolia.etherscan.io/address/0x0a6248a1b263e7260cd464fd5774201e30786f26";
+  "https://sepolia.etherscan.io/address/0xe7b082bc8f9022f66b0cadf6d2548ffaeb441489";
 
-// TODO: replace with the real app URL when it's ready.
-const LAUNCH_APP_URL = "#";
+// TODO: swap for the deployed frontend URL once it's live (currently local-only).
+const LAUNCH_APP_URL = "http://localhost:3000";
 
 export default function Home() {
   useEffect(() => {
