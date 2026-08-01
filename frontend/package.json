@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@iexec-nox/handle": "^0.1.0-beta.13",
+    "@safe-global/api-kit": "^2",
+    "@safe-global/protocol-kit": "^4",
     "ethers": "^6.13.0",
     "next": "^15.0.0",
     "react": "^18.3.0",

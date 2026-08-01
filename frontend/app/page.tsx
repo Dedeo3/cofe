@@ -2,7 +2,11 @@ export default function HomePage() {
   return (
     <main>
       <div className="tag">A privacy layer for onchain payroll</div>
-      <h1>Pay your team. Keep the numbers private.</h1>
+      <h1>
+        Pay your team.
+        <br />
+        <span className="muted">Keep the numbers private.</span>
+      </h1>
       <p>
         Salary amounts and recipient lists stay confidential — encrypted via iExec Nox —
         while the company Safe keeps full custody and every transaction remains

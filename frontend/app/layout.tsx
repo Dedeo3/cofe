@@ -9,17 +9,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <div className="shell">
-          <header style={{ marginBottom: "2rem" }}>
-            <div className="brand">[ Confidential Safe Payroll ]</div>
-            <nav className="nav">
-              <a href="/">Home</a>
-              <a href="/admin">Admin</a>
-              <a href="/employee">Employee</a>
-            </nav>
-          </header>
-          {children}
-        </div>
+        <header className="site-header">
+          <a className="brand" href="/">
+            Confidential Safe Payroll
+          </a>
+          <nav className="nav">
+            <a href="/">Home</a>
+            <a href="/admin">Admin</a>
+            <a href="/employee">Employee</a>
+          </nav>
+        </header>
+        <div className="shell">{children}</div>
       </body>
     </html>
   );

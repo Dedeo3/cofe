@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Contract } from "ethers";
+import { Interface } from "ethers";
 import { createEthersHandleClient } from "@iexec-nox/handle";
+import SafeSdkPkg from "@safe-global/protocol-kit";
+import SafeApiKitPkg from "@safe-global/api-kit";
 import { connectWallet } from "../../lib/wallet";
-import { PAYROLL_VAULT_ABI, PAYROLL_VAULT_ADDRESS } from "../../lib/contracts";
+import { PAYROLL_VAULT_ABI, PAYROLL_VAULT_ADDRESS, CONFIDENTIAL_USDC_ADDRESS, SAFE_ADDRESS, CHAIN_ID } from "../../lib/contracts";
+
+// Both packages are CJS-only; depending on the bundler's interop the default
+// import may already be the class, or the whole module.exports. Unwrap
+// defensively so this works either way.
+const Safe: typeof SafeSdkPkg = (SafeSdkPkg as any).default ?? SafeSdkPkg;
+const SafeApiKit: typeof SafeApiKitPkg = (SafeApiKitPkg as any).default ?? SafeApiKitPkg;
 
 type Row = { employee: string; amount: string };
 
@@ -40,8 +48,17 @@ export default function AdminPage() {
     setStatus("");
     setBusy(true);
     try {
-      const { signer } = await connectWallet();
-      const handleClient = await createEthersHandleClient(signer);
+      const { address: ownerAddress } = await connectWallet();
+
+      // Proofs are bound to (app, owner) = the contract and msg.sender active
+      // when the proof is consumed. runPayroll() forwards the proof into
+      // ConfidentialUSDC.confidentialTransferFrom(), which is what actually
+      // calls Nox.fromExternal() — so app = ConfidentialUSDC, and owner =
+      // PayrollVault (the contract that calls confidentialTransferFrom).
+      // Neither is the connected wallet, so we bind against a minimal
+      // duck-typed "signer" that only needs to report the Vault's address.
+      const vaultOwnerClient = { getAddress: async () => PAYROLL_VAULT_ADDRESS, provider: window.ethereum };
+      const handleClient = await createEthersHandleClient(vaultOwnerClient as any);
 
       const employees: string[] = [];
       const encryptedAmounts: string[] = [];
@@ -56,7 +73,7 @@ export default function AdminPage() {
         const { handle, handleProof } = await handleClient.encryptInput(
           smallestUnits,
           "uint256",
-          PAYROLL_VAULT_ADDRESS,
+          CONFIDENTIAL_USDC_ADDRESS,
         );
         employees.push(row.employee);
         encryptedAmounts.push(handle);
@@ -68,12 +85,50 @@ export default function AdminPage() {
         return;
       }
 
-      setStatus(`Submitting payroll for ${employees.length} employee(s)...`);
-      const vault = new Contract(PAYROLL_VAULT_ADDRESS, PAYROLL_VAULT_ABI, signer);
-      const tx = await vault.runPayroll(employees, encryptedAmounts, inputProofs);
-      setStatus(`Tx submitted: ${tx.hash} — waiting for confirmation...`);
-      await tx.wait();
-      setStatus(`Payroll run complete for ${employees.length} employee(s). Amounts stayed confidential end-to-end.`);
+      // PayrollVault's admin is the Safe itself, not this wallet directly —
+      // runPayroll() must be submitted as a Safe transaction. Since the
+      // connected wallet needs to be a Safe owner, the wallet prompts for
+      // an EIP-712 signature (and, if threshold is 1, the execution tx too).
+      const vaultInterface = new Interface(PAYROLL_VAULT_ABI);
+      const data = vaultInterface.encodeFunctionData("runPayroll", [employees, encryptedAmounts, inputProofs]);
+
+      setStatus("Connecting to Safe...");
+      const protocolKit = await Safe.init({ provider: window.ethereum, signer: ownerAddress, safeAddress: SAFE_ADDRESS });
+      const threshold = await protocolKit.getThreshold();
+
+      const safeTransaction = await protocolKit.createTransaction({
+        transactions: [{ to: PAYROLL_VAULT_ADDRESS, value: "0", data }],
+      });
+
+      setStatus("Sign the Safe transaction in your wallet...");
+      const signedSafeTransaction = await protocolKit.signTransaction(safeTransaction);
+
+      if (threshold === 1) {
+        setStatus(`Submitting payroll for ${employees.length} employee(s)...`);
+        const execResult = await protocolKit.executeTransaction(signedSafeTransaction);
+        setStatus(`Tx submitted: ${execResult.hash} — waiting for confirmation...`);
+        await connectWallet().then(({ provider }) => provider.waitForTransaction(execResult.hash));
+        setStatus(`Payroll run complete for ${employees.length} employee(s). Amounts stayed confidential end-to-end.`);
+        return;
+      }
+
+      setStatus(`Safe threshold is ${threshold} — proposing transaction for co-signers...`);
+      const safeTxHash = await protocolKit.getTransactionHash(safeTransaction);
+      const senderSignature = signedSafeTransaction.getSignature(ownerAddress);
+      if (!senderSignature) {
+        throw new Error("Failed to produce owner signature for the Safe transaction.");
+      }
+      const apiKit = new SafeApiKit({ chainId: BigInt(CHAIN_ID) });
+      await apiKit.proposeTransaction({
+        safeAddress: SAFE_ADDRESS,
+        safeTransactionData: signedSafeTransaction.data,
+        safeTxHash,
+        senderAddress: ownerAddress,
+        senderSignature: senderSignature.data,
+      });
+      setStatus(
+        `Proposed (hash ${safeTxHash}). Other Safe owners must confirm at app.safe.global (Sepolia) before it executes.`,
+      );
     } catch (err: any) {
       setStatus(`Error: ${err.message ?? String(err)}`);
     } finally {

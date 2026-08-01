@@ -1,6 +1,7 @@
 export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? "11155111");
 export const PAYROLL_VAULT_ADDRESS = (process.env.NEXT_PUBLIC_PAYROLL_VAULT_ADDRESS ?? "") as `0x${string}`;
 export const CONFIDENTIAL_USDC_ADDRESS = (process.env.NEXT_PUBLIC_CONFIDENTIAL_USDC_ADDRESS ?? "") as `0x${string}`;
+export const SAFE_ADDRESS = (process.env.NEXT_PUBLIC_SAFE_ADDRESS ?? "") as `0x${string}`;
 
 export const PAYROLL_VAULT_ABI = [
   "function runPayroll(address[] employees, bytes32[] encryptedAmounts, bytes[] inputProofs) external",
