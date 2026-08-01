@@ -54,7 +54,7 @@ export default function AdminPage() {
     setStatus("");
     setBusy(true);
     try {
-      const { address: ownerAddress } = await connectWallet();
+      const { address: ownerAddress, provider } = await connectWallet();
       const { createEthersHandleClient } = await import("@iexec-nox/handle");
 
       // Proofs are bound to (app, owner) = the contract and msg.sender active
@@ -64,7 +64,10 @@ export default function AdminPage() {
       // PayrollVault (the contract that calls confidentialTransferFrom).
       // Neither is the connected wallet, so we bind against a minimal
       // duck-typed "signer" that only needs to report the Vault's address.
-      const vaultOwnerClient = { getAddress: async () => PAYROLL_VAULT_ADDRESS, provider: window.ethereum };
+      // `provider` must be an ethers Provider (getNetwork/getBlockNumber),
+      // not the raw injected window.ethereum — connectWallet() already
+      // wraps it in a BrowserProvider, so reuse that.
+      const vaultOwnerClient = { getAddress: async () => PAYROLL_VAULT_ADDRESS, provider };
       const handleClient = await createEthersHandleClient(vaultOwnerClient as any);
 
       const employees: string[] = [];
